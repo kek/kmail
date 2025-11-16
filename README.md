@@ -12,8 +12,10 @@ Content-Type: <content type, for example application/pdf>
 
 #### Example request
 
-`POST /share/payable/from/1/to/2`
-`Content-Type: application/pdf`
+```
+POST /share/payable/from/1/to/2
+Content-Type: application/pdf
+```
 
 #### Example response
 
@@ -23,8 +25,10 @@ Content-Type: <content type, for example application/pdf>
 
 #### Example request
 
-`POST /share/nonpayable/from/1/to/2`
-`Content-Type: application/pdf`
+```
+POST /share/nonpayable/from/1/to/2
+Content-Type: application/pdf
+```
 
 #### Example response
 
