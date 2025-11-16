@@ -21,10 +21,15 @@ Start the app with `rebar3 shell --eval "sync:go()."`
 ## Terminology
 
 - Sender: A user that can send a *package* to a *recipient* via their *mailbox*.
-- Package: A collection of data that resides in a *mailbox*. It has a *sender*, a *recipient*, which owns the mailbox, a *file type*, a *payload* of that type, and *payable* information.
-- Mailbox: A collection of packages that have been sent to a *recipient*. Each recipient has one mailbox.
-- Recipient: A user that has registered a *mailbox*. The recipient also has a *password* which they need to use for accessing the mailbox.
-- Password: A secure string that the recipient receives when registering a *mailbox*.
+- Package: A collection of data that resides in a *mailbox*. It has a *sender*,
+a *recipient*, which owns the mailbox, a *file type*, a *payload* of that type,
+and *payable* information.
+- Mailbox: A collection of packages that have been sent to a *recipient*. Each
+recipient has one mailbox.
+- Recipient: A user that has registered a *mailbox*. The recipient also has a
+*password* which they need to use for accessing the mailbox.
+- Password: A secure string that the recipient receives when registering a
+*mailbox*.
 
 ## Sender API
 
