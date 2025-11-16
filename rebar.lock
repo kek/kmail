@@ -7,6 +7,6 @@
        {ref,"08771aba2ce4935b715d32d1b92555efdc3da994"}},
   1},
  {<<"riakc">>,
-  {git,"https://github.com/basho/riak-erlang-client.git",
+  {git,"https://github.com/kivra/riak-erlang-client.git",
        {ref,"9773e1582bb7af16d1b4e45a946d40cc42bf38bd"}},
   0}].
