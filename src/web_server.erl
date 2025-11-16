@@ -23,16 +23,16 @@ handle(_Method, _Path, _Req) ->
     {404, [], ~"Not Found"}.
 
 handle_event(request_error, [Req, Error, Stacktrace], _Args) ->
-    io:format("*** ~p error ***~n~nHeaders:~n~s~nStacktrace:~n~p~n~n", [
-        Error, printable_headers(Req), Stacktrace
-    ]),
+    ErrorInfo = [Error, printable_headers(Req), Stacktrace],
+    io:format("*** ~p error ***~n~nHeaders:~n~s~nStacktrace:~n~p~n~n", ErrorInfo),
     ok;
 handle_event(
     request_complete,
     [Req, Status, _Headers, _ResponseBody, {_Timers, _Lengths}],
     _
 ) ->
-    log_result(Req, Status),
+    Metadata = [human_time(), Req#req.method, [~"/" | Req#req.path], Status],
+    io:format("~s ~s ~s -> ~p~n", Metadata),
     ok;
 handle_event(request_closed, _Data, _Args) ->
     ok;
@@ -43,9 +43,6 @@ handle_event(Event, Data, Args) ->
 human_time() ->
     {H, M, S} = time(),
     io_lib:format("~.2.0w:~.2.0w:~.2.0w", [H, M, S]).
-
-path_join(Path) ->
-    binary:join([~"/" | Path], ~"/").
 
 render_template(Template, Params) ->
     TemplateBase = ~"src/templates/",
@@ -58,8 +55,3 @@ render_template(Template, Params) ->
 printable_headers(Req) ->
     Headers = Req#req.headers,
     io_lib:format("~p~n", [Headers]).
-
-log_result(Req, Result) ->
-    Method = Req#req.method,
-    Path = path_join(Req#req.path),
-    io:format("~s ~s ~s -> ~p~n", [human_time(), Method, Path, Result]).
