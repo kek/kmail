@@ -31,7 +31,9 @@ init([]) ->
         intensity => 0,
         period => 1
     },
-    ChildSpecs = [],
+    ChildSpecs = [
+        #{id => "Repository", start => {repo, start_link, ["kmail"]}}
+    ],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions
