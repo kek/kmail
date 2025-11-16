@@ -32,7 +32,8 @@ init([]) ->
         period => 1
     },
     ChildSpecs = [
-        #{id => "Repository", start => {repo, start_link, ["kmail"]}}
+        #{id => "Repository", start => {repo, start_link, ["kmail"]}},
+        #{id => "Web Server", start => {elli, start_link, [[{callback, web_server}, {port, 4000}]]}}
     ],
     {ok, {SupFlags, ChildSpecs}}.
 
