@@ -2,7 +2,7 @@
 
 -export([store/3]).
 -export([retrieve/2]).
--export([start_link/1]).
+-export([start_link/2]).
 
 -export([init/1, handle_call/3, handle_cast/2]).
 
@@ -10,18 +10,31 @@
 
 %% API
 
-start_link(Bucket) ->
-    gen_server:start_link(repo, [Bucket], []).
+start_link(Bucket, Options) ->
+    gen_server:start_link(repo, [Bucket, Options], []).
 
-store(Pid, Key, Value) ->
-    gen_server:call(Pid, {store, Key, Value}).
+store(Name, Key, Value) when not is_pid(Name) ->
+    case whereis(Name) of
+        undefined ->
+            io:format("Panic, repo ~p not started~n", [Name]),
+            {error, "Repo not started"};
+        Pid ->
+            store(Pid, Key, Value)
+    end;
+store(Repo, Key, Value) ->
+    gen_server:call(Repo, {store, Key, Value}).
 
-retrieve(Pid, Key) ->
-    gen_server:call(Pid, {retrieve, Key}).
+retrieve(Repo, Key) ->
+    gen_server:call(Repo, {retrieve, Key}).
 
 %% Callbacks for `gen_server`
 
-init([Bucket]) ->
+init([Bucket, Options]) ->
+    io:format("Started repo with bucket ~p, options: ~p~n", [Bucket, Options]),
+    case lists:keyfind(name, 1, Options) of
+        {name, Name} -> true = register(Name, self());
+        false -> false
+    end,
     {ok, Conn} = riakc_pb_socket:start("127.0.0.1", 8087),
     {ok, {Conn, Bucket}}.
 

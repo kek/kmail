@@ -2,7 +2,7 @@
 -module(repo_test).
 
 setup() ->
-    {ok, Repo} = repo:start_link(~"kmail_repo_test"),
+    {ok, Repo} = repo:start_link(~"kmail_repo_test", []),
     Repo.
 
 teardown(_Repo) ->

@@ -18,13 +18,23 @@ handle('GET' = _Method, [] = _Path, _Req) ->
     Headers = [{"Content-Type", "text/html; charset=utf-8"}],
     {StatusCode, Headers, Body};
 handle('GET', [~"share", _ID], _Req) ->
-    {200, [], ~"[]"};
+    {200, [], ~([])};
+handle('POST', [~"consumer"], _Req) ->
+    Consumer = consumer:create(),
+    Body = iolist_to_binary(json:encode(Consumer)),
+    Headers = [{"Content-Type", "application/json"}],
+    {201, Headers, Body};
 handle(_Method, _Path, _Req) ->
     {404, [], ~"Not Found"}.
 
+handle_event(elli_startup, [], undefined) ->
+    io:format("Web server starting.~n~n");
 handle_event(request_error, [Req, Error, Stacktrace], _Args) ->
-    ErrorInfo = [Error, printable_headers(Req), Stacktrace],
+    ErrorInfo = [
+        Error, printable_headers(Req), Stacktrace
+    ],
     io:format("*** ~p error ***~n~nHeaders:~n~s~nStacktrace:~n~p~n~n", ErrorInfo),
+    % erl_error:format_exception(error, Error, Stacktrace)
     ok;
 handle_event(
     request_complete,

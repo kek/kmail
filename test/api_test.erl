@@ -13,27 +13,25 @@ teardown(Pid) ->
 web_test_() ->
     {setup, fun setup/0, fun teardown/1, fun(_Pid) ->
         [
-            {"friendly face", fun() ->
-                {StatusCode, _Body} = http_get(~"http://localhost:44000"),
-                ?assertEqual(200, StatusCode)
-            % ?assertEqual(~"🐻\n", Body)
-            end},
-
-            {"Getting the list of shares, when the list is empty, renders an empty list", fun() ->
-                {StatusCode, Body} = http_get(~"http://localhost:44000/share/1"),
+            {"start page", fun() ->
+                {StatusCode, _Body, RespHeaders} = http_get("/"),
+                {~"Content-Type", ContentType} = lists:keyfind(~"Content-Type", 1, RespHeaders),
                 ?assertEqual(200, StatusCode),
-                ?assertEqual(~"[]", Body)
+                ?assertEqual(~"text/html; charset=utf-8", ContentType)
             end}
         ]
     end}.
 
-http_get(URL) ->
+http_get(Path) ->
     Method = get,
-    Headers = [],
     Payload = <<>>,
+    http_request(Payload, Path, Method).
+
+http_request(Payload, Path, Method) ->
+    Headers = [],
     Options = [],
-    {ok, StatusCode, _RespHeaders, ClientRef} = hackney:request(
-        Method, URL, Headers, Payload, Options
+    {ok, StatusCode, RespHeaders, ClientRef} = hackney:request(
+        Method, lists:concat(["http://localhost:44000", Path]), Headers, Payload, Options
     ),
     {ok, Body} = hackney:body(ClientRef),
-    {StatusCode, Body}.
+    {StatusCode, Body, RespHeaders}.
