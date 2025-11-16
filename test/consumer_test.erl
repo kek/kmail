@@ -30,10 +30,18 @@ consumer_test_() ->
                         ?assertNot(true)
                 end
             end},
-            {"Getting the list of shares, when the list is empty, renders an empty list", fun() ->
-                ?assertEqual(200, StatusCode),
-                ?assertEqual(~"[]", Body)
-            end}
+            {"Getting the list of shares for a consumer that does not exist renders 404", fun() ->
                 {StatusCode, Body, _RespHeaders} = http_helpers:http_get("/share/1"),
+                ?assertEqual(404, StatusCode),
+                ?assertEqual(#{~"error" => ~"No such consumer ID"}, json:decode(Body))
+            end},
+            {"Listing shares for a newly registered consumer renders an empty list", fun() ->
+                {201, Body, _RespHeaders} = http_helpers:http_post("/consumer", <<>>),
+                #{~"id" := ID, ~"password" := _Password} = json:decode(Body),
+                Path = io_lib:format("/share/~s", [ID]),
+                {StatusCode1, Body1, _RespHeaders1} = http_helpers:http_get(Path),
+                ?assertEqual(200, StatusCode1),
+                ?assertEqual([], json:decode(Body1))
+            end}
         ]
     end}.

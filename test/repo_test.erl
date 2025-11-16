@@ -23,7 +23,7 @@ repo_test_() ->
             {"when storing a value, it can be retrieved later", fun() ->
                 ok = repo:store(Repo, "Hey", "There"),
                 {ok, Value} = repo:retrieve(Repo, "Hey"),
-                ?assertEqual("There", Value)
+                ?assertEqual("There", binary_to_term(Value))
             end},
             {"when trying to retrieve a value that doesn't exist, we get an error", fun() ->
                 Result = repo:retrieve(Repo, "nonexistent key"),

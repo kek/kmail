@@ -17,11 +17,16 @@ handle('GET' = _Method, [] = _Path, _Req) ->
     Body = render_template(Template, Data),
     Headers = [{"Content-Type", "text/html; charset=utf-8"}],
     {StatusCode, Headers, Body};
-handle('GET', [~"share", _ID], _Req) ->
-    {200, [], ~([])};
+handle('GET', [~"share", ID], _Req) ->
+    case repo:retrieve(repo, ID) of
+        {error, notfound} ->
+            {404, [], json:encode(#{error => ~"No such consumer ID"})};
+        {ok, _Value} ->
+            {200, [], json:encode([])}
+    end;
 handle('POST', [~"consumer"], _Req) ->
     Consumer = consumer:create(),
-    Body = iolist_to_binary(json:encode(Consumer)),
+    Body = json:encode(Consumer),
     Headers = [{"Content-Type", "application/json"}],
     {201, Headers, Body};
 handle(_Method, _Path, _Req) ->
