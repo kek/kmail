@@ -54,8 +54,8 @@ handle_event(
     Metadata = [human_time(), Req#req.method, [~"/" | Req#req.path], Status],
     logger:info("~s ~s ~s -> ~p~n", Metadata),
     ok;
-handle_event(request_closed, _Data, _Args) ->
-    logger:warning("Request closed~n"),
+handle_event(request_closed, Data, Args) ->
+    logger:warning("~s request closed: ~p ~p~n", [human_time(), Data, Args]),
     ok;
 handle_event(Event, Data, Args) ->
     logger:warning("*** Unknown event ~p ***~nData: ~p~nArgs: ~p~n", [Event, Data, Args]),
@@ -66,12 +66,13 @@ human_time() ->
     io_lib:format("~.2.0w:~.2.0w:~.2.0w", [H, M, S]).
 
 render_template(Template, Params) ->
-    TemplateBase = ~"src/templates/",
-    TemplateBinary = list_to_binary(Template),
-    TemplatePath = <<TemplateBase/binary, TemplateBinary/binary>>,
-    {ok, Bin} = file:read_file(TemplatePath),
-    Body = bbmustache:render(Bin, Params),
-    Body.
+    case code:priv_dir(kmail) of
+        PrivDir when is_list(PrivDir) ->
+            TemplatePath = filename:join([PrivDir, "templates", Template]),
+            {ok, Bin} = file:read_file(TemplatePath),
+            Body = bbmustache:render(Bin, Params),
+            Body
+    end.
 
 printable_headers(Req) ->
     Headers = Req#req.headers,

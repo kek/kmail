@@ -1,2 +1,1 @@
--include_lib("eunit/include/eunit.hrl").
 -module(sender).
