@@ -22,19 +22,18 @@ handle('GET', [~"share", _ID], _Req) ->
 handle(_Method, _Path, _Req) ->
     {404, [], ~"Not Found"}.
 
-handle_event(request_error, Data, Args) ->
-    io:format("*** Request error ***\n\nData: ~p\nArgs: ~p\n\n", [Data, Args]),
+handle_event(request_error, [Req, Error, Stacktrace], _Args) ->
+    io:format("*** ~p error ***~n~nHeaders:~n~s~nStacktrace:~n~p~n~n", [Error, printable_headers(Req), Stacktrace]),
     ok;
 handle_event(request_complete,
     [Req, Status, _Headers, _ResponseBody, {_Timers, _Lengths}], _) ->
-    Method = Req#req.method,
-    Path = path_join(Req#req.path),
-    io:format("~s ~s ~s -> ~p\n\n", [human_time(), Method, Path, Status]),
+    log_result(Req, Status),
     ok;
+
 handle_event(request_closed, _Data, _Args) ->
     ok;
 handle_event(Event, Data, Args) ->
-    io:format("*** Unknown event ~p ***\n\nData: ~p\nArgs: ~p\n\n", [Event, Data, Args]),
+    io:format("*** Unknown event ~p ***~nData: ~p~nArgs: ~p~n", [Event, Data, Args]),
     ok.
 
 human_time() ->
@@ -51,3 +50,12 @@ render_template(Template,Params) ->
     {ok, Bin} = file:read_file(TemplatePath),
     Body = bbmustache:render(Bin, Params),
     Body.
+
+printable_headers(Req) ->
+    Headers = Req#req.headers,
+    io_lib:format("~p~n", [Headers]).
+
+log_result(Req, Result) ->
+    Method = Req#req.method,
+    Path = path_join(Req#req.path),
+    io:format("~s ~s ~s -> ~p~n", [human_time(), Method, Path, Result]).
