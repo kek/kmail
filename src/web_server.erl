@@ -15,7 +15,6 @@ handle('GET' = _Method, [] = _Path, _Req) ->
     Headers = [{"Content-Type", "text/plain; charset=utf-8"}],
     Body = ~"🐻",
     {StatusCode, Headers, Body};
-
 handle(_Method, _Path, _Req) ->
     {404, [], ~"Not Found"}.
 
