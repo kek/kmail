@@ -17,19 +17,19 @@ handle('GET' = _Method, [] = _Path, _Req) ->
     Body = render_template(Template, Data),
     Headers = [{"Content-Type", "text/html; charset=utf-8"}],
     {StatusCode, Headers, Body};
-handle('GET', [~"share", ID], _Req) ->
+handle('GET', [~"mailbox", ID, ~"packages"], _Req) ->
     case repo:retrieve(repo, ID) of
         {error, notfound} ->
-            json_error(404, ~"No such consumer ID");
+            json_error(404, ~"No such mailbox ID");
         {ok, _Value} ->
             {200, [], json:encode([])}
     end;
-handle('POST', [~"consumer"], _Req) ->
+handle('POST', [~"mailbox"], _Req) ->
     Consumer = consumer:create(),
     Body = json:encode(Consumer),
     Headers = [{"Content-Type", "application/json"}],
     {201, Headers, Body};
-handle('POST', [~"share", ~"nonpayable", ~"from", _SenderID, ~"to", RecipientID], _Req) ->
+handle('POST', [~"mailbox", RecipientID, ~"package", ~"from", _SenderID], _Req) ->
     case repo:retrieve(repo, RecipientID) of
         {ok, _} -> json_response(201, #{});
         {error, notfound} -> json_error(404, ~"Recipient not found")

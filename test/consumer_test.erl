@@ -14,8 +14,8 @@ teardown({ElliPid}) ->
 consumer_test_() ->
     {setup, fun setup/0, fun teardown/1, fun(_Pid) ->
         [
-            {"Registering a consumer generates an ID and a password", fun() ->
-                {StatusCode, Body, RespHeaders} = test_helpers:http_post("/consumer", <<>>),
+            {"Registering a mailbox generates an ID and a password", fun() ->
+                {StatusCode, Body, RespHeaders} = test_helpers:http_post("/mailbox", <<>>),
                 case lists:keyfind(~"Content-Type", 1, RespHeaders) of
                     {~"Content-Type", ContentType} ->
                         ?assertEqual(201, StatusCode),
@@ -29,15 +29,15 @@ consumer_test_() ->
                         ?assertNot(true)
                 end
             end},
-            {"Getting the list of shares for a consumer that does not exist renders 404", fun() ->
-                {StatusCode, Body, _RespHeaders} = test_helpers:http_get("/share/1"),
+            {"Getting the list of packages in a mailbox that does not exist renders 404", fun() ->
+                {StatusCode, Body, _RespHeaders} = test_helpers:http_get("/mailbox/1/packages"),
                 ?assertEqual(404, StatusCode),
-                ?assertEqual(#{~"error" => ~"No such consumer ID"}, json:decode(Body))
+                ?assertEqual(#{~"error" => ~"No such mailbox ID"}, json:decode(Body))
             end},
-            {"Listing shares for a newly registered consumer renders an empty list", fun() ->
-                {201, Body, _RespHeaders} = test_helpers:http_post("/consumer", <<>>),
+            {"Listing packages for a newly registered mailbox renders an empty list", fun() ->
+                {201, Body, _RespHeaders} = test_helpers:http_post("/mailbox", <<>>),
                 #{~"id" := ID, ~"password" := _Password} = json:decode(Body),
-                Path = io_lib:format("/share/~s", [ID]),
+                Path = io_lib:format("/mailbox/~s/packages", [ID]),
                 {StatusCode1, Body1, _RespHeaders1} = test_helpers:http_get(Path),
                 ?assertEqual(200, StatusCode1),
                 ?assertEqual([], json:decode(Body1))
