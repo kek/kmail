@@ -14,32 +14,26 @@ web_test_() ->
     {setup, fun setup/0, fun teardown/1, fun(_Pid) ->
         [
             {"friendly face", fun() ->
-                Method = get,
-                URL = ~"http://localhost:44000",
-                Headers = [],
-                Payload = <<>>,
-                Options = [],
-                {ok, StatusCode, _RespHeaders, ClientRef} = hackney:request(
-                    Method, URL, Headers, Payload, Options
-                ),
-
-                {ok, Body} = hackney:body(ClientRef),
+                {StatusCode, Body} = http_get(~"http://localhost:44000"),
                 ?assertEqual(200, StatusCode),
                 ?assertEqual(~"🐻", Body)
             end},
 
             {"Getting the list of shares, when the list is empty, renders an empty list", fun() ->
-                Method = get,
-                URL = ~"http://localhost:44000/share/1",
-                Headers = [],
-                Payload = <<>>,
-                Options = [],
-                {ok, StatusCode, _RespHeaders, ClientRef} = hackney:request(
-                    Method, URL, Headers, Payload, Options
-                ),
-                {ok, Body} = hackney:body(ClientRef),
+                {StatusCode, Body} = http_get(~"http://localhost:44000/share/1"),
                 ?assertEqual(200, StatusCode),
                 ?assertEqual(~"[]", Body)
             end}
         ]
     end}.
+
+http_get(URL) ->
+    Method = get,
+    Headers = [],
+    Payload = <<>>,
+    Options = [],
+    {ok, StatusCode, _RespHeaders, ClientRef} = hackney:request(
+        Method, URL, Headers, Payload, Options
+    ),
+    {ok, Body} = hackney:body(ClientRef),
+    {StatusCode, Body}.
