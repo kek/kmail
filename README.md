@@ -79,3 +79,9 @@ Get a list of shares to this receiver.
 Get a particular share.
 
 ## Deploying
+
+## Developer tooling
+
+### Auto code reloading
+
+Start the app with `rebar3 shell --eval "sync:go()."`
