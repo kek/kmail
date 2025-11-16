@@ -16,7 +16,7 @@ start_link(Bucket, Options) ->
 store(Name, Key, Value) when not is_pid(Name) ->
     case whereis(Name) of
         undefined ->
-            io:format("Panic, repo ~p not started~n", [Name]),
+            logger:critical("repo ~p not started~n", [Name]),
             {error, "Repo not started"};
         Pid ->
             store(Pid, Key, Value)
@@ -30,7 +30,7 @@ retrieve(Repo, Key) ->
 %% Callbacks for `gen_server`
 
 init([Bucket, Options]) ->
-    io:format("Started repo with bucket ~p, options: ~p~n", [Bucket, Options]),
+    logger:info("Started repo with bucket ~p, options: ~p~n", [Bucket, Options]),
     case lists:keyfind(name, 1, Options) of
         {name, Name} -> true = register(Name, self());
         false -> false
