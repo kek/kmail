@@ -2,5 +2,6 @@
 -module(kmail_test).
 
 a_test() ->
-    A = ok,
-    ?assert(A =:= ok).
+    ok = repo:store("Hey", "There"),
+    {ok, Value} = repo:retrieve("Hey"),
+    "There" = Value.
