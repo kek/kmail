@@ -3,7 +3,7 @@
 
 setup() ->
     application:ensure_all_started(hackney),
-    {ok, Pid} = elli:start_link([{callback, web_server}, {port, 44002}]),
+    {ok, Pid} = elli:start_link([{callback, web_server}, {port, 44000}]),
     Pid.
 
 teardown(Pid) ->
