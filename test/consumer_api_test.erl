@@ -1,5 +1,5 @@
 -include_lib("eunit/include/eunit.hrl").
--module(consumer_test).
+-module(consumer_api_test).
 
 setup() ->
     application:ensure_all_started(hackney),

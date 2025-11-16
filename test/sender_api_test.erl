@@ -1,5 +1,5 @@
 -include_lib("eunit/include/eunit.hrl").
--module(sender_test).
+-module(sender_api_test).
 
 -export([setup/0, teardown/1]).
 

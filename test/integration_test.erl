@@ -43,6 +43,8 @@ consumer_test_() ->
                     ],
                     json:decode(PackageList)
                 ),
+
+                % Download the file
                 [#{~"links" := #{~"download" := DownloadLink}}] = json:decode(PackageList),
                 {200, Download, DownloadRespHeaders} = test_helpers:http_get(
                     binary_to_list(DownloadLink)
