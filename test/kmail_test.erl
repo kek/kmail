@@ -5,7 +5,7 @@
     {ok, Repo} = repo:start(),
     ok = repo:store(Repo, "Hey", "There"),
     {ok, Value} = repo:retrieve(Repo, "Hey"),
-    "There" = Value.
+    ?assertEqual("There", Value).
 
 'when trying to retrieve a value that doesn\'t exist, we get an error   _test'() ->
     {ok, Repo} = repo:start(),
