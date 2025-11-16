@@ -16,7 +16,7 @@ web_test_() ->
             {"friendly face", fun() ->
                 {StatusCode, Body} = http_get(~"http://localhost:44000"),
                 ?assertEqual(200, StatusCode),
-                ?assertEqual(~"🐻", Body)
+                ?assertEqual(~"🐻\n", Body)
             end},
 
             {"Getting the list of shares, when the list is empty, renders an empty list", fun() ->

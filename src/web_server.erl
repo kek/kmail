@@ -13,7 +13,9 @@ handle(Req, _Args) ->
 handle('GET' = _Method, [] = _Path, _Req) ->
     StatusCode = ok,
     Headers = [{"Content-Type", "text/plain; charset=utf-8"}],
-    Body = ~"🐻",
+    {ok, Bin} = file:read_file("src/templates/index.html"),
+    Data = #{},
+    Body = bbmustache:render(Bin, Data),
     {StatusCode, Headers, Body};
 handle('GET', [~"share", _ID], _Req) ->
     {200, [], ~"[]"};
