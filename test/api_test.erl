@@ -3,11 +3,11 @@
 
 setup() ->
     application:ensure_all_started(hackney),
-    {ok, Pid} = elli:start_link([{callback, web_server}, {port, 44000}]),
-    Pid.
+    ElliPid = test_helpers:start_web_server(),
+    {ElliPid}.
 
-teardown(Pid) ->
-    exit(Pid, normal),
+teardown({ElliPid}) ->
+    exit(ElliPid, normal),
     ok.
 
 web_test_() ->

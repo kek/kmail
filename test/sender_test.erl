@@ -6,7 +6,7 @@
 setup() ->
     application:ensure_all_started(hackney),
     ok = test_helpers:start_repo(),
-    {ok, ElliPid} = elli:start_link([{callback, web_server}, {port, 44000}]),
+    ElliPid = test_helpers:start_web_server(),
     {ElliPid}.
 
 teardown({ElliPid}) ->
