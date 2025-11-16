@@ -54,17 +54,13 @@ deliver(Repo, Package, RecipientID) ->
 find_package(Repo, RecipientID, PackageID) ->
     case repo:retrieve(Repo, RecipientID) of
         {ok, #{packages := Packages}} when is_list(Packages) ->
-            {value, Value} = lists:search(
-                fun(Package) ->
-                    case Package of
-                        #{id := PackageID} -> true;
-                        _ -> false
-                    end
-                end,
-                Packages
-            ),
+            MatchesPackageID = fun(Package) -> matches_package_id(Package, PackageID) end,
+            {value, Value} = lists:search(MatchesPackageID, Packages),
             {ok, Value}
     end.
+
+matches_package_id(#{id := PackageID}, PackageID) -> true;
+matches_package_id(_, _) -> false.
 
 generate_id() ->
     integer_to_binary(rand:uniform(1000000000)).
