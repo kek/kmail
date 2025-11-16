@@ -22,7 +22,7 @@ sender_test_() ->
                     test_helpers:http_post(
                         Path,
                         ~"Hello",
-                        [{"Content-Type", "text/plain"}]
+                        [{~"Content-Type", ~"text/plain"}]
                     ),
                 ?assertEqual(404, StatusCode),
                 ?assertEqual(#{~"error" => ~"Recipient not found"}, json:decode(Body))
@@ -34,7 +34,7 @@ sender_test_() ->
                     test_helpers:http_post(
                         Path,
                         ~"Hello",
-                        [{"Content-Type", "text/plain"}]
+                        [{~"Content-Type", ~"text/plain"}]
                     ),
                 ?assertEqual(201, StatusCode)
             end}

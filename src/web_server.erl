@@ -10,33 +10,52 @@ handle(Req, _Args) ->
     Path = elli_request:path(Req),
     handle(Method, Path, Req).
 
+% Get start page
 handle('GET' = _Method, [] = _Path, _Req) ->
     StatusCode = ok,
     Data = #{},
     Template = "index.html",
     Body = render_template(Template, Data),
-    Headers = [{"Content-Type", "text/html; charset=utf-8"}],
+    Headers = [{~"Content-Type", ~"text/html; charset=utf-8"}],
     {StatusCode, Headers, Body};
+% List packages in a mailbox
 handle('GET', [~"mailbox", ID, ~"packages"], _Req) ->
-    case repo:retrieve(repo, ID) of
+    case mailbox:contents(repo, ID) of
         {error, notfound} ->
             json_error(404, ~"No such mailbox ID");
-        {ok, _Value} ->
-            {200, [], json:encode([])}
+        {ok, PackageList} ->
+            {200, [], json:encode(PackageList)}
     end;
+% Download a package
+handle('GET', [~"mailbox", RecipientID, ~"packages", PackageID], _Req) ->
+    {ok, Package} = mailbox:find_package(repo, RecipientID, PackageID),
+    #{payload := Payload, fileType := FileType} = Package,
+    {200, [{~"Content-Type", FileType}], Payload};
+% Register a mailbox
 handle('POST', [~"mailbox"], _Req) ->
     Consumer = mailbox:create(),
     Body = json:encode(Consumer),
-    Headers = [{"Content-Type", "application/json"}],
+    Headers = [{~"Content-Type", ~"application/json"}],
     {201, Headers, Body};
-handle('POST', [~"mailbox", RecipientID, ~"package", ~"from", _SenderID], _Req) ->
+% Send a package to a mailbox
+handle('POST', [~"mailbox", RecipientID, ~"package", ~"from", SenderID], Req) ->
     case repo:retrieve(repo, RecipientID) of
-        {ok, _} -> json_response(201, #{});
-        {error, notfound} -> json_error(404, ~"Recipient not found")
+        {ok, _} ->
+            Package = #{
+                sender => SenderID,
+                fileType => elli_request:get_header(~"Content-Type", Req),
+                payload => elli_request:body(Req)
+            },
+            mailbox:deliver(repo, Package, RecipientID),
+            json_response(201, #{});
+        {error, notfound} ->
+            json_error(404, ~"Recipient not found")
     end;
+% Unknown request path/method
 handle(_Method, _Path, _Req) ->
     json_error(404, ~"Unknown request").
 
+% Request lifecycle callbacks
 handle_event(elli_startup, [], undefined) ->
     logger:info("Web server starting.~n~n");
 handle_event(request_error, [Req, Error, Stacktrace], _Args) ->
@@ -61,6 +80,7 @@ handle_event(Event, Data, Args) ->
     logger:warning("*** Unknown event ~p ***~nData: ~p~nArgs: ~p~n", [Event, Data, Args]),
     ok.
 
+% "Helper" functions
 human_time() ->
     {H, M, S} = time(),
     io_lib:format("~.2.0w:~.2.0w:~.2.0w", [H, M, S]).

@@ -91,7 +91,8 @@ Get a list of packages for this receiver.
 [
   {
     "id": "1",
-    "content-type": "application/pdf",
+    "fileType": "application/pdf",
+    "sender": "kalle",
     "paid": false,
     "links": {"download": "/mailbox/100/packages/1"}
   }
@@ -100,11 +101,11 @@ Get a list of packages for this receiver.
 
 ### `GET /mailbox/<receiver>/packages/<package>`
 
-Get a particular package.
+Get a package payload.
 
 ## Deploying
 
-`rebar3 release` generates a release at
+`rebar3 release` generates a release at `_build/default/rel/kmail`
 
 ## Roadmap
 

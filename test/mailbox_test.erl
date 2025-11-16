@@ -12,7 +12,7 @@ teardown(_Repo) ->
 mailbox_test_() ->
     {setup, fun setup/0, fun teardown/1, fun(Repo) ->
         [
-            {"reading nonexistant mailbox renders error", fun() ->
+            {"reading nonexistent mailbox renders error", fun() ->
                 ?assertMatch({error, notfound}, mailbox:contents(Repo, "nonexistant_mailbox"))
             end},
             {"after creating a mailbox, it is empty", fun() ->
@@ -20,20 +20,44 @@ mailbox_test_() ->
                 {ok, Packages} = mailbox:contents(Repo, ID),
                 ?assertEqual([], Packages)
             end},
-            {"after putting a package to a mailbox, it contains that package", fun() ->
+            {"after putting a package in a mailbox, it contains that package", fun() ->
                 #{id := RecipientID} = mailbox:create(Repo),
                 Package = #{
                     fileType => "text/plain", payload => "Merry Christmas!", sender => "Santa Claus"
                 },
                 ok = mailbox:deliver(Repo, Package, RecipientID),
-                Package2 = #{
-                    fileType => "text/plain",
-                    payload => "And a happy new year!",
-                    sender => "Santa Claus"
+                {ok, [ReceivedPackage]} = mailbox:contents(Repo, RecipientID),
+                ?assertMatch(
+                    #{
+                        ~"id" := _PackageID,
+                        ~"fileType" := "text/plain",
+                        ~"paid" := false,
+                        ~"sender" := "Santa Claus",
+                        ~"links" := #{
+                            ~"download" := _DownloadLink
+                        }
+                    },
+                    ReceivedPackage
+                )
+            end},
+            {"finding a package by recipient ID and package ID", fun() ->
+                #{id := RecipientID} = mailbox:create(Repo),
+                SentPackage = #{
+                    fileType => "text/plain", payload => "Merry Christmas!", sender => "Santa Claus"
                 },
-                ok = mailbox:deliver(Repo, Package2, RecipientID),
-                {ok, Packages} = mailbox:contents(Repo, RecipientID),
-                ?assertNotEqual([], Packages)
+                ok = mailbox:deliver(Repo, SentPackage, RecipientID),
+                {ok, [ReceivedPackage]} = mailbox:contents(Repo, RecipientID),
+                #{~"id" := PackageID} = ReceivedPackage,
+                {ok, Package} = mailbox:find_package(Repo, RecipientID, PackageID),
+                ?assertMatch(
+                    #{
+                        id := _,
+                        fileType := "text/plain",
+                        payload := "Merry Christmas!",
+                        sender := "Santa Claus"
+                    },
+                    Package
+                )
             end}
         ]
     end}.

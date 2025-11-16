@@ -30,7 +30,9 @@ consumer_test_() ->
                 end
             end},
             {"Getting the list of packages in a mailbox that does not exist renders 404", fun() ->
-                {StatusCode, Body, _RespHeaders} = test_helpers:http_get("/mailbox/1/packages"),
+                {StatusCode, Body, _RespHeaders} = test_helpers:http_get(
+                    "/mailbox/999999/packages"
+                ),
                 ?assertEqual(404, StatusCode),
                 ?assertEqual(#{~"error" => ~"No such mailbox ID"}, json:decode(Body))
             end},

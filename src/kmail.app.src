@@ -1,5 +1,5 @@
 {application, kmail, [
-    {description, "An OTP application"},
+    {description, "Send data from one user to another"},
     {vsn, "0.1.0"},
     {registered, []},
     {mod, {kmail_app, []}},
