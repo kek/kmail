@@ -13,22 +13,25 @@
 start_link(Bucket, Options) ->
     gen_server:start_link(repo, [Bucket, Options], []).
 
+-spec store(Name :: atom() | pid(), Key :: riakc_obj:key(), Value :: term()) -> term().
 store(Name, Key, Value) when not is_pid(Name) ->
     case whereis(Name) of
         undefined ->
             logger:critical("repo ~p not started~n", [Name]),
             {error, "Repo not started"};
-        Pid ->
+        Pid when is_pid(Pid) ->
             store(Pid, Key, Value)
     end;
 store(Repo, Key, Value) ->
     gen_server:call(Repo, {store, Key, Value}).
 
+-spec retrieve(Repo :: atom() | pid(), Key :: riakc_obj:key()) -> term().
 retrieve(Repo, Key) ->
     gen_server:call(Repo, {retrieve, Key}).
 
 %% Callbacks for `gen_server`
 
+-spec init(list()) -> {ok, state()}.
 init([Bucket, Options]) ->
     logger:info("Started repo with bucket ~p, options: ~p~n", [Bucket, Options]),
     case lists:keyfind(name, 1, Options) of
@@ -38,12 +41,18 @@ init([Bucket, Options]) ->
     {ok, Conn} = riakc_pb_socket:start("127.0.0.1", 8087),
     {ok, {Conn, Bucket}}.
 
+-type state() :: {pid(), riakc_obj:bucket()}.
+-type store() :: {store, binary(), riakc_obj:value()}.
+-type retrieve() :: {retrieve, binary()}.
+-type calls() :: store() | retrieve().
+
+-spec handle_call(calls(), {pid(), gen_server:reply_tag()}, state()) -> {reply, term(), state()}.
 handle_call({store, Key, Value}, _From, {Riak, Bucket} = State) ->
     case riakc_obj:new(Bucket, term_to_binary(Key), Value) of
         {error, Error} ->
             {reply, Error, State};
         Object ->
-            riakc_pb_socket:put(Riak, Object),
+            ok = riakc_pb_socket:put(Riak, Object),
             {reply, ok, State}
     end;
 handle_call({retrieve, Key}, _From, {Pid, MyBucket} = State) ->
@@ -57,5 +66,6 @@ handle_call({retrieve, Key}, _From, {Pid, MyBucket} = State) ->
         end,
     {reply, Result, State}.
 
-handle_cast(_Request, _State) ->
-    erlang:error(not_implemented).
+handle_cast(Request, State) ->
+    logger:warning("repo received unknown cast: ~w (~w)", [Request, State]),
+    {noreply, State}.
