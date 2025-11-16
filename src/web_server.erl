@@ -20,7 +20,7 @@ handle('GET' = _Method, [] = _Path, _Req) ->
 handle('GET', [~"share", ID], _Req) ->
     case repo:retrieve(repo, ID) of
         {error, notfound} ->
-            {404, [], json:encode(#{error => ~"No such consumer ID"})};
+            json_error(404, ~"No such consumer ID");
         {ok, _Value} ->
             {200, [], json:encode([])}
     end;
@@ -29,8 +29,13 @@ handle('POST', [~"consumer"], _Req) ->
     Body = json:encode(Consumer),
     Headers = [{"Content-Type", "application/json"}],
     {201, Headers, Body};
+handle('POST', [~"share", ~"nonpayable", ~"from", _SenderID, ~"to", RecipientID], _Req) ->
+    case repo:retrieve(repo, RecipientID) of
+        {ok, _} -> json_response(201, #{});
+        {error, notfound} -> json_error(404, ~"Recipient not found")
+    end;
 handle(_Method, _Path, _Req) ->
-    {404, [], ~"Not Found"}.
+    json_error(404, ~"Unknown request").
 
 handle_event(elli_startup, [], undefined) ->
     logger:info("Web server starting.~n~n");
@@ -71,3 +76,9 @@ render_template(Template, Params) ->
 printable_headers(Req) ->
     Headers = Req#req.headers,
     io_lib:format("~p~n", [Headers]).
+
+json_response(StatusCode, Data) ->
+    {StatusCode, [{"Content-Type", "application/json"}], json:encode(Data)}.
+
+json_error(StatusCode, ErrorMessage) ->
+    {StatusCode, [{"Content-Type", "application/json"}], json:encode(#{error => ErrorMessage})}.

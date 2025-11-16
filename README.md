@@ -13,7 +13,7 @@ Content-Type: <content type, for example application/pdf>
 #### Example request
 
 ```
-POST /share/payable/from/1/to/89A523DC-56D2-4C0B-AFA1-4B78D9FA824B
+POST /share/payable/from/kalle/to/89A523DC-56D2-4C0B-AFA1-4B78D9FA824B
 Content-Type: application/pdf
 ```
 
@@ -26,7 +26,7 @@ Content-Type: application/pdf
 #### Example request
 
 ```
-POST /share/nonpayable/from/1/to/89A523DC-56D2-4C0B-AFA1-4B78D9FA824B
+POST /share/nonpayable/from/kalle/to/89A523DC-56D2-4C0B-AFA1-4B78D9FA824B
 Content-Type: application/pdf
 ```
 
