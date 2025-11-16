@@ -15,7 +15,7 @@ web_test_() ->
         [
             {"friendly face", fun() ->
                 Method = get,
-                URL = <<"http://localhost:44000">>,
+                URL = ~"http://localhost:44000",
                 Headers = [],
                 Payload = <<>>,
                 Options = [],
@@ -26,6 +26,20 @@ web_test_() ->
                 {ok, Body} = hackney:body(ClientRef),
                 ?assertEqual(200, StatusCode),
                 ?assertEqual(~"🐻", Body)
+            end},
+
+            {"Getting the list of shares, when the list is empty, renders an empty list", fun() ->
+                Method = get,
+                URL = ~"http://localhost:44000/share/1",
+                Headers = [],
+                Payload = <<>>,
+                Options = [],
+                {ok, StatusCode, _RespHeaders, ClientRef} = hackney:request(
+                    Method, URL, Headers, Payload, Options
+                ),
+                {ok, Body} = hackney:body(ClientRef),
+                ?assertEqual(200, StatusCode),
+                ?assertEqual(~"[]", Body)
             end}
         ]
     end}.
