@@ -28,7 +28,7 @@ sender_test_() ->
                 ?assertEqual(#{~"error" => ~"Recipient not found"}, json:decode(Body))
             end},
             {"Sending content", fun() ->
-                #{id := ID} = consumer:create(),
+                #{id := ID} = mailbox:create(),
                 Path = binary_to_list(<<"/mailbox/", ID/binary, "/package/from/kalle">>),
                 {StatusCode, _Body, _Headers} =
                     test_helpers:http_post(

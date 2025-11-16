@@ -1,6 +1,6 @@
 -module(test_helpers).
 
--export([http_get/1, http_post/2, start_repo/0, http_post/3, start_web_server/0]).
+-export([http_get/1, http_post/2, start_repo/0, http_post/3, start_web_server/0, clear_bucket/1]).
 
 http_get(Path) ->
     http_request(<<>>, Path, get, []).
@@ -32,3 +32,13 @@ start_repo() ->
 start_web_server() ->
     {ok, ElliPid} = elli:start_link([{callback, web_server}, {port, 44000}]),
     ElliPid.
+
+clear_bucket(Bucket) ->
+    {ok, Conn} = riakc_pb_socket:start("127.0.0.1", 8087),
+    {ok, Keys} = riakc_pb_socket:list_keys(Conn, Bucket),
+    lists:foreach(
+        fun(Key) ->
+            ok = riakc_pb_socket:delete(Conn, Bucket, Key)
+        end,
+        Keys
+    ).

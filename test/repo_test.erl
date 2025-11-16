@@ -6,15 +6,7 @@ setup() ->
     Repo.
 
 teardown(_Repo) ->
-    {ok, Conn} = riakc_pb_socket:start("127.0.0.1", 8087),
-    Bucket = ~"kmail_repo_test",
-    {ok, Keys} = riakc_pb_socket:list_keys(Conn, Bucket),
-    lists:foreach(
-        fun(Key) ->
-            ok = riakc_pb_socket:delete(Conn, Bucket, Key)
-        end,
-        Keys
-    ),
+    test_helpers:clear_bucket(~"kmail_repo_test"),
     ok.
 
 repo_test_() ->
@@ -23,7 +15,12 @@ repo_test_() ->
             {"when storing a value, it can be retrieved later", fun() ->
                 ok = repo:store(Repo, "Hey", "There"),
                 {ok, Value} = repo:retrieve(Repo, "Hey"),
-                ?assertEqual("There", binary_to_term(Value))
+                ?assertEqual("There", Value)
+            end},
+            {"we can store a list", fun() ->
+                ok = repo:store(Repo, "List", []),
+                {ok, Value} = repo:retrieve(Repo, "List"),
+                ?assertEqual([], Value)
             end},
             {"when trying to retrieve a value that doesn't exist, we get an error", fun() ->
                 Result = repo:retrieve(Repo, "nonexistent key"),

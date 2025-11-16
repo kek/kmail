@@ -60,7 +60,7 @@ handle_call({retrieve, Key}, _From, {Pid, MyBucket} = State) ->
         case riakc_pb_socket:get(Pid, MyBucket, term_to_binary(Key)) of
             {ok, Fetched} ->
                 Value = riakc_obj:get_value(Fetched),
-                {ok, Value};
+                {ok, binary_to_term(Value)};
             {error, notfound} ->
                 {error, notfound}
         end,

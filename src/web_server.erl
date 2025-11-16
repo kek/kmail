@@ -25,7 +25,7 @@ handle('GET', [~"mailbox", ID, ~"packages"], _Req) ->
             {200, [], json:encode([])}
     end;
 handle('POST', [~"mailbox"], _Req) ->
-    Consumer = consumer:create(),
+    Consumer = mailbox:create(),
     Body = json:encode(Consumer),
     Headers = [{"Content-Type", "application/json"}],
     {201, Headers, Body};
