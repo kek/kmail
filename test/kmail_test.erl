@@ -9,4 +9,5 @@
 
 'when trying to retrieve a value that doesn\'t exist, we get an error   _test'() ->
     {ok, Repo} = repo:start_link(~"kmail_test"),
-    ?assertEqual({error, notfound}, repo:retrieve(Repo, "nonexistent key")).
+    Result = repo:retrieve(Repo, "nonexistent key"),
+    ?assertEqual({error, notfound}, Result).
