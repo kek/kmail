@@ -116,5 +116,10 @@ Get a package payload.
 
 There are a few outstanding items that need discovery to clarify the business case and requirements.
 
-- Senders could be authenticated somehow. Company K might need some backoffice interface to provision allowed senders, or they could be able to self-provision.
-- There should be a payment solution by which senders or recipients can pay for packages before the packages are released.
+- Senders could be authenticated somehow. Company K might need some backoffice
+interface to provision allowed senders, or they could be able to self-provision.
+- There should be a payment solution by which senders or recipients can pay for
+packages before the packages are released.
+- We should enforce a low maximum file size or consider using something other
+than Riak for storing the package payloads, as Riak does not perform
+well when storing large objects.
