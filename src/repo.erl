@@ -26,9 +26,13 @@ init([Bucket]) ->
     {ok, {Conn, Bucket}}.
 
 handle_call({store, Key, Value}, _From, {Riak, Bucket} = State) ->
-    Object = riakc_obj:new(Bucket, term_to_binary(Key), Value),
-    riakc_pb_socket:put(Riak, Object),
-    {reply, ok, State};
+    case riakc_obj:new(Bucket, term_to_binary(Key), Value) of
+        {error, Error} ->
+            {reply, Error, State};
+        Object ->
+            riakc_pb_socket:put(Riak, Object),
+            {reply, ok, State}
+    end;
 handle_call({retrieve, Key}, _From, {Pid, MyBucket} = State) ->
     Result =
         case riakc_pb_socket:get(Pid, MyBucket, term_to_binary(Key)) of
