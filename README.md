@@ -85,3 +85,11 @@ Get a particular share.
 ### Auto code reloading
 
 Start the app with `rebar3 shell --eval "sync:go()."`
+
+### Test watcher
+
+`find src test priv rebar.config | entr rebar3 eunit`
+
+### Watch for file changes and auto format
+
+`find src test priv rebar.config | entr rebar3 fmt -w`
