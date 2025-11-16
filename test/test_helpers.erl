@@ -1,6 +1,6 @@
 -module(test_helpers).
 
--export([http_get/1, http_post/2, start_repo/0, http_post/3]).
+-export([http_get/1, http_post/2, start_repo/0, http_post/3, start_web_server/0]).
 
 http_get(Path) ->
     http_request(<<>>, Path, get, []).
@@ -28,3 +28,7 @@ start_repo() ->
         _ ->
             ok
     end.
+
+start_web_server() ->
+    {ok, ElliPid} = elli:start_link([{callback, web_server}, {port, 44000}]),
+    ElliPid.
