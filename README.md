@@ -13,7 +13,7 @@ Content-Type: <content type, for example application/pdf>
 #### Example request
 
 ```
-POST /share/payable/from/1/to/2
+POST /share/payable/from/1/to/89A523DC-56D2-4C0B-AFA1-4B78D9FA824B
 Content-Type: application/pdf
 ```
 
@@ -26,7 +26,7 @@ Content-Type: application/pdf
 #### Example request
 
 ```
-POST /share/nonpayable/from/1/to/2
+POST /share/nonpayable/from/1/to/89A523DC-56D2-4C0B-AFA1-4B78D9FA824B
 Content-Type: application/pdf
 ```
 
@@ -36,13 +36,32 @@ Content-Type: application/pdf
 
 ## Consumer API
 
+### `POST /consumer`
+
+Register a consumer
+
+#### Example output
+
+`POST /consumer`
+
+```
+{
+  "id": "89A523DC-56D2-4C0B-AFA1-4B78D9FA824B",
+  "password": "ggqiqyvzisplodhkeravcdzwfwxuhduyrbxzlbbgnlzrylwz"
+}
+```
+
 ### `GET /share/<receiver>`
+
+#### Headers
+
+`Password: ggqiqyvzisplodhkeravcdzwfwxuhduyrbxzlbbgnlzrylwz`
 
 Get a list of shares to this receiver.
 
 #### Example output
 
-`GET /share/100`
+`GET /share/89A523DC-56D2-4C0B-AFA1-4B78D9FA824B`
 
 ```
 [
