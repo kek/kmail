@@ -4,7 +4,9 @@ Kmail lets users send content to other users. It's like email without email!
 
 ## Developing
 
-Use Erlang/OTP 28.1.1. Riak is used for persistence and needs to be running at the local machine. Start the server: `rebar3 shell`. Access the endpoints at http://localhost:4000.
+Use Erlang/OTP 28.1.1. Riak is used for persistence and needs to be running at
+the local machine. Start the server: `rebar3 shell`. Access the endpoints at
+http://localhost:4000.
 
 ### Auto code reloading
 
@@ -24,6 +26,7 @@ Start the app with `rebar3 shell --eval "sync:go()."`
 - Package: A collection of data that resides in a *mailbox*. It has a *sender*,
 a *recipient*, which owns the mailbox, a *file type*, a *payload* of that type,
 and *payable* information.
+- Payload: The actual contents of the file being sent.
 - Mailbox: A collection of packages that have been sent to a *recipient*. Each
 recipient has one mailbox.
 - Recipient: A user that has registered a *mailbox*. The recipient also has a
@@ -114,12 +117,25 @@ Get a package payload.
 
 ## Roadmap
 
-There are a few outstanding items that need discovery to clarify the business case and requirements.
+Not yet implemented:
+- Requiring the correct password to download a package.
+- We should have a Dockerfile to build a deployable image and we also need to
+make the Riak endpoint configurable to be able to run in for example Kubernetes
+or AWS where the database will not be running on localhost.
+- The IDs/passwords being generated are currently just a random string of
+digits, it should be UUIDs without risk of conflict and something else that
+makes for a stronger password.
 
-- Senders could be authenticated somehow. Company K might need some backoffice
+There are a few outstanding items that need discovery to clarify the business
+case and requirements.
+
+- Senders could be authenticated somehow. We might need some backoffice
 interface to provision allowed senders, or they could be able to self-provision.
 - There should be a payment solution by which senders or recipients can pay for
 packages before the packages are released.
 - We should enforce a low maximum file size or consider using something other
 than Riak for storing the package payloads, as Riak does not perform
 well when storing large objects.
+- Depending on the security requirements, we could encrypt the files when
+storing them with a public/private key scheme where the reciever maintains the
+private key.
