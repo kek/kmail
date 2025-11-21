@@ -117,7 +117,12 @@ Get a package payload.
 
 ## Roadmap
 
+There is probably a race condition where if a mailbox gets two deliveries at the
+same time, one of them will be lost. Perhaps it can be solved by storing the
+objects differently.
+
 Not yet implemented:
+
 - Requiring the correct password to download a package.
 - We should have a Dockerfile to build a deployable image and we also need to
 make the Riak endpoint configurable to be able to run in for example Kubernetes
